@@ -51,6 +51,7 @@ module Bim
     belongs_to :work_package, class_name: 'WorkPackage'
     belongs_to :ifc_model, class_name: 'Bim::IfcModels::IfcModel'
     belongs_to :user, optional: true
+    belongs_to :template, class_name: 'Bim::LinkTemplate', optional: true
 
     validates :element_id, presence: true, length: { maximum: 50 }
     validates :element_id, uniqueness: { scope: :work_package_id }
