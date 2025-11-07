@@ -21,6 +21,9 @@ module Bim
 
       belongs_to :project
       belongs_to :uploader, class_name: "User"
+      has_one :ifc_model_metadata,
+              class_name: 'Bim::IfcModels::IfcModelMetadata',
+              dependent: :destroy
 
       validates :title, presence: true
       validates :project, presence: true
