@@ -323,6 +323,7 @@ module Bim
       def advance_progress(weight)
         @current_progress += weight
         ifc_model.update!(conversion_progress: @current_progress.to_i)
+        broadcast_progress_update
       end
 
       def handle_conversion_failure(error)
@@ -331,6 +332,23 @@ module Bim
         ifc_model.conversion_status = ::Bim::IfcModels::IfcModel.conversion_statuses[:error]
         ifc_model.conversion_error_message = error.message
         ifc_model.save
+        broadcast_progress_update
+      end
+
+      # Turbo Streams broadcasting for real-time updates
+
+      def broadcast_progress_update
+        return unless defined?(Turbo)
+
+        Turbo::StreamsChannel.broadcast_replace_to(
+          "ifc_model_#{ifc_model.id}",
+          target: "ifc-model-#{ifc_model.id}-status",
+          partial: "bim/ifc_models/ifc_models/conversion_status",
+          locals: { ifc_model: ifc_model }
+        )
+      rescue StandardError => e
+        # Don't fail conversion if broadcasting fails
+        Rails.logger.warn("Failed to broadcast progress update: #{e.message}")
       end
 
       # Logging methods
