@@ -25,6 +25,12 @@ module Bim
               class_name: 'Bim::IfcModels::IfcModelMetadata',
               dependent: :destroy
 
+      # 3D Viewer associations
+      has_many :saved_views, class_name: 'Bim::SavedView', dependent: :destroy
+      has_many :section_configs, class_name: 'Bim::SectionConfig', dependent: :destroy
+      has_many :measurements, class_name: 'Bim::Measurement', dependent: :destroy
+      has_many :annotations, class_name: 'Bim::Annotation', dependent: :destroy
+
       validates :title, presence: true
       validates :project, presence: true
 

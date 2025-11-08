@@ -119,6 +119,44 @@ Rails.application.routes.draw do
             get :conversion_logs
             get :metadata
             post :refresh_metadata
+            # 3D Viewer features
+            get 'saved_views', to: 'viewer#saved_views'
+            post 'saved_views', to: 'viewer#create_saved_view'
+            get 'section_configs', to: 'viewer#section_configs'
+            post 'section_configs', to: 'viewer#create_section_config'
+            get 'measurements', to: 'viewer#measurements'
+            post 'measurements', to: 'viewer#create_measurement'
+            get 'measurements/export', to: 'viewer#export_measurements'
+            get 'annotations', to: 'viewer#annotations'
+            post 'annotations', to: 'viewer#create_annotation'
+          end
+        end
+
+        # 3D Viewer resource endpoints
+        resources :saved_views, controller: "viewer", only: [] do
+          member do
+            get :show_saved_view, action: :show_saved_view, as: 'show'
+            patch :update_saved_view, action: :update_saved_view, as: 'update'
+            delete :destroy_saved_view, action: :destroy_saved_view, as: 'destroy'
+          end
+        end
+
+        resources :section_configs, controller: "viewer", only: [] do
+          member do
+            delete :destroy_section_config, action: :destroy_section_config, as: 'destroy'
+          end
+        end
+
+        resources :measurements, controller: "viewer", only: [] do
+          member do
+            delete :destroy_measurement, action: :destroy_measurement, as: 'destroy'
+          end
+        end
+
+        resources :annotations, controller: "viewer", only: [] do
+          member do
+            patch :update_annotation, action: :update_annotation, as: 'update'
+            delete :destroy_annotation, action: :destroy_annotation, as: 'destroy'
           end
         end
       end
