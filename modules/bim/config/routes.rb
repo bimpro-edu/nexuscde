@@ -179,6 +179,34 @@ Rails.application.routes.draw do
             delete :destroy_annotation, action: :destroy_annotation, as: 'destroy'
           end
         end
+
+        # Collaboration features
+        resources :comment_mentions, controller: "comment_mentions", only: [:index] do
+          collection do
+            get ':comment_id', action: :show, as: 'comment'
+          end
+        end
+
+        # Comment reactions
+        resources :comments, only: [] do
+          member do
+            get 'reactions', to: 'comment_reactions#index'
+            post 'reactions', to: 'comment_reactions#create'
+            post 'reactions/toggle', to: 'comment_reactions#toggle'
+            delete 'reactions', to: 'comment_reactions#destroy'
+          end
+        end
+
+        # IFC Model viewer presence
+        resources :ifc_models, only: [] do
+          member do
+            get 'presence', to: 'viewer_presence#index'
+            post 'presence', to: 'viewer_presence#create'
+            put 'presence', to: 'viewer_presence#update'
+            patch 'presence', to: 'viewer_presence#update'
+            delete 'presence', to: 'viewer_presence#destroy'
+          end
+        end
       end
     end
   end

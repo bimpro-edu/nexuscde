@@ -35,6 +35,9 @@ module Bim
       has_many :federation_models, class_name: 'Bim::FederationModel', dependent: :destroy
       has_many :model_federations, through: :federation_models, class_name: 'Bim::ModelFederation'
 
+      # Collaboration associations
+      has_many :viewer_presences, class_name: 'Bim::ViewerPresence', dependent: :destroy
+
       validates :title, presence: true
       validates :project, presence: true
 
