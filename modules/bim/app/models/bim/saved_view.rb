@@ -48,6 +48,9 @@ module Bim
     scope :private_views, -> { where(is_public: false) }
     scope :for_model, ->(model_id) { where(ifc_model_id: model_id) }
     scope :for_user, ->(user_id) { where(user_id: user_id) }
+    scope :defaults, -> { where(is_default: true) }
+    scope :ordered, -> { order(:sort_order, :created_at) }
+    scope :recent, -> { order(created_at: :desc) }
 
     # Helper method to get camera position as array
     def camera_position
@@ -65,6 +68,58 @@ module Bim
       self.camera_look = position[:look] || position['look']
       self.camera_up = position[:up] || position['up']
       self.projection = position[:projection] || position['projection'] || 'perspective'
+    end
+
+    # Check if this is the default view
+    def default?
+      is_default
+    end
+
+    # Check if perspective projection
+    def perspective?
+      projection == 'perspective'
+    end
+
+    # Check if orthogonal projection
+    def orthogonal?
+      projection == 'orthogonal'
+    end
+
+    # Calculate distance from eye to look point
+    def camera_distance
+      eye = camera_eye || [0, 0, 0]
+      look = camera_look || [0, 0, 0]
+      Math.sqrt(
+        (eye[0] - look[0])**2 +
+        (eye[1] - look[1])**2 +
+        (eye[2] - look[2])**2
+      )
+    end
+
+    # Get view direction vector (normalized)
+    def view_direction
+      eye = camera_eye || [0, 0, 0]
+      look = camera_look || [0, 0, 0]
+      dx = look[0] - eye[0]
+      dy = look[1] - eye[1]
+      dz = look[2] - eye[2]
+      length = Math.sqrt(dx**2 + dy**2 + dz**2)
+      return [0, 0, -1] if length.zero?
+
+      [dx / length, dy / length, dz / length]
+    end
+
+    # Export view configuration for frontend
+    def to_config
+      {
+        id: id,
+        name: name,
+        description: description,
+        camera: camera_position,
+        distance: camera_distance,
+        is_default: is_default,
+        created_at: created_at
+      }
     end
 
     private
