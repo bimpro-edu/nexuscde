@@ -22,7 +22,7 @@ module Bim
       end
 
       # Generate security report for project
-      def generate_security_report(since: 30.days.ago)
+      def generate_security_report(since: Bim::AuditLog::DEFAULT_ACTIVITY_PERIOD.ago)
         {
           project_id: @project.id,
           project_name: @project.name,
@@ -38,7 +38,7 @@ module Bim
       end
 
       # Export audit logs to CSV
-      def export_to_csv(since: 30.days.ago)
+      def export_to_csv(since: Bim::AuditLog::DEFAULT_ACTIVITY_PERIOD.ago)
         logs = Bim::AuditLog.for_project(@project.id).since(since).recent
         Bim::AuditLog.to_csv(logs)
       end

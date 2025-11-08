@@ -4,10 +4,21 @@ module Bim
   class ApiToken < ApplicationRecord
     self.table_name = 'bim_api_tokens'
 
+    # Configuration constants
+    TOKEN_LENGTH = 32 # bytes
+    TOKEN_PREFIX_LENGTH = 8 # characters (0..7 = 8 chars)
+    DEFAULT_CLEANUP_PERIOD = 30.days
+    NAME_MAX_LENGTH = 255
+
+    # Time interval constants for humanization
+    SECONDS_IN_MINUTE = 60
+    SECONDS_IN_HOUR = 3600
+    SECONDS_IN_DAY = 86_400
+
     belongs_to :user
     belongs_to :project, optional: true # Optional for global tokens
 
-    validates :name, presence: true, length: { maximum: 255 }
+    validates :name, presence: true, length: { maximum: NAME_MAX_LENGTH }
     validates :token_hash, presence: true, uniqueness: true
     validates :token_prefix, presence: true
 
@@ -42,9 +53,9 @@ module Bim
 
     # Generate a new API token
     def self.generate(user:, name:, project: nil, scopes: [], expires_in: nil)
-      token = SecureRandom.urlsafe_base64(32)
+      token = SecureRandom.urlsafe_base64(TOKEN_LENGTH)
       token_hash = hash_token(token)
-      token_prefix = token[0..7]
+      token_prefix = token[0..(TOKEN_PREFIX_LENGTH - 1)]
 
       api_token = create!(
         user: user,
@@ -74,7 +85,7 @@ module Bim
     end
 
     # Cleanup expired tokens (call from scheduled job)
-    def self.cleanup_expired(older_than: 30.days.ago)
+    def self.cleanup_expired(older_than: DEFAULT_CLEANUP_PERIOD.ago)
       expired.where('expires_at < ?', older_than).delete_all
     end
 
@@ -172,7 +183,7 @@ module Bim
     def set_token_prefix
       # Token prefix is set during generation
       # This callback is just a safety check
-      self.token_prefix ||= SecureRandom.hex(4)
+      self.token_prefix ||= SecureRandom.hex(TOKEN_PREFIX_LENGTH / 2)
     end
 
     def time_ago_in_words(time)
@@ -185,14 +196,14 @@ module Bim
       diff = (Time.current - time).to_i.abs
 
       case diff
-      when 0..59
+      when 0..(SECONDS_IN_MINUTE - 1)
         'less than a minute'
-      when 60..3599
-        "#{diff / 60} minutes"
-      when 3600..86_399
-        "#{diff / 3600} hours"
+      when SECONDS_IN_MINUTE..(SECONDS_IN_HOUR - 1)
+        "#{diff / SECONDS_IN_MINUTE} minutes"
+      when SECONDS_IN_HOUR..(SECONDS_IN_DAY - 1)
+        "#{diff / SECONDS_IN_HOUR} hours"
       else
-        "#{diff / 86_400} days"
+        "#{diff / SECONDS_IN_DAY} days"
       end
     end
   end

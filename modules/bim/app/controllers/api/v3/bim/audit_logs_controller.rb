@@ -4,6 +4,8 @@ module API
   module V3
     module Bim
       class AuditLogsController < ApplicationController
+        DEFAULT_PER_PAGE = 25
+
         before_action :find_project
         before_action :authorize
 
@@ -18,7 +20,7 @@ module API
 
           # Pagination
           page = (params[:page] || 1).to_i
-          per_page = (params[:per_page] || 25).to_i
+          per_page = (params[:per_page] || DEFAULT_PER_PAGE).to_i
           logs = logs.limit(per_page).offset((page - 1) * per_page)
 
           render json: {
@@ -36,7 +38,7 @@ module API
         # GET /api/v3/projects/:project_id/bim/audit_logs/export
         def export
           service = ::Bim::Security::AuditService.new(user: current_user, project: @project)
-          since = params[:since] ? Time.parse(params[:since]) : 30.days.ago
+          since = params[:since] ? Time.parse(params[:since]) : ::Bim::AuditLog::DEFAULT_ACTIVITY_PERIOD.ago
 
           csv_data = service.export_to_csv(since: since)
 
@@ -48,7 +50,7 @@ module API
         # GET /api/v3/projects/:project_id/bim/audit_logs/report
         def report
           service = ::Bim::Security::AuditService.new(user: current_user, project: @project)
-          since = params[:since] ? Time.parse(params[:since]) : 30.days.ago
+          since = params[:since] ? Time.parse(params[:since]) : ::Bim::AuditLog::DEFAULT_ACTIVITY_PERIOD.ago
 
           report = service.generate_security_report(since: since)
 
