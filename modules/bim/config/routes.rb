@@ -113,6 +113,26 @@ Rails.application.routes.draw do
         # Metrics Aggregation
         resources :metrics, controller: "metrics", only: %i[index]
 
+        # Federated Models (nested under projects in API paths)
+      end
+    end
+  end
+
+  # Project-scoped federation routes
+  namespace :api do
+    namespace :v3 do
+      resources :projects, only: [] do
+        namespace :bim do
+          resources :federations, controller: "bim/federations", only: %i[index show create update destroy] do
+            member do
+              post :align
+              get :viewer_config
+            end
+          end
+        end
+      end
+
+      namespace :bim do
         # IFC Models API
         resources :ifc_models, controller: "ifc_models", only: %i[index show create update destroy] do
           member do

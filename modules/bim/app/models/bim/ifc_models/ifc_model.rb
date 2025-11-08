@@ -31,6 +31,10 @@ module Bim
       has_many :measurements, class_name: 'Bim::Measurement', dependent: :destroy
       has_many :annotations, class_name: 'Bim::Annotation', dependent: :destroy
 
+      # Federated Models associations
+      has_many :federation_models, class_name: 'Bim::FederationModel', dependent: :destroy
+      has_many :model_federations, through: :federation_models, class_name: 'Bim::ModelFederation'
+
       validates :title, presence: true
       validates :project, presence: true
 
