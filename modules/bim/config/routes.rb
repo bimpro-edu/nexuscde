@@ -254,8 +254,19 @@ Rails.application.routes.draw do
             collection do
               get :export
               get :report
+              get :timeline
             end
           end
+        end
+      end
+
+      # Global audit log endpoints (not project-scoped)
+      namespace :bim do
+        namespace :audit_logs, controller: "audit_logs" do
+          get ':id', action: :show, as: 'show'
+          get ':id/verify', action: :verify, as: 'verify'
+          get 'entity/:entity_type/:entity_id/history', action: :entity_history, as: 'entity_history'
+          get 'entity/:entity_type/:entity_id/versions', action: :entity_versions, as: 'entity_versions'
         end
       end
     end
