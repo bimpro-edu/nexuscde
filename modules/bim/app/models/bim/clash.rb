@@ -14,6 +14,8 @@ module Bim
   class Clash < ApplicationRecord
     self.table_name = 'bim_clashes'
 
+    include Bim::Concerns::Workflowable
+
     # Clash types define the nature of the geometric conflict
     enum clash_type: {
       hard: 0,        # Physical intersection/overlap

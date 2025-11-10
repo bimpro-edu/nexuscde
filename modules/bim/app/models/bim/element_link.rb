@@ -32,6 +32,8 @@ module Bim
   class ElementLink < ApplicationRecord
     self.table_name = 'bim_element_links'
 
+    include Bim::Concerns::Workflowable
+
     # Relationship types define why an element is linked to a work package
     enum relationship_type: {
       affected_by: 0,       # Element is affected by this work package/issue
