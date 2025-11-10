@@ -149,6 +149,30 @@ Rails.application.routes.draw do
             get 'measurements/export', to: 'viewer#export_measurements'
             get 'annotations', to: 'viewer#annotations'
             post 'annotations', to: 'viewer#create_annotation'
+
+            # V9.7 UX/UI Polish - Model Tree
+            get 'tree', to: 'model_tree#index'
+            get 'tree/nodes/:node_id/children', to: 'model_tree#children', as: 'tree_children'
+            post 'tree/search', to: 'model_tree#search', as: 'tree_search'
+
+            # V9.7 UX/UI Polish - Element Properties (nested under elements/:guid)
+            get 'elements/:guid/properties', to: 'elements#properties', as: 'element_properties'
+            patch 'elements/:guid/properties', to: 'elements#update_properties'
+            get 'elements/:guid/related', to: 'elements#related', as: 'element_related'
+            get 'elements/:guid/history', to: 'elements#history', as: 'element_history'
+
+            # V9.7 UX/UI Polish - Visibility Controls
+            get 'visibility', to: 'visibility#show'
+            post 'visibility', to: 'visibility#apply'
+            post 'visibility/isolate', to: 'visibility#isolate', as: 'visibility_isolate'
+            post 'visibility/reset', to: 'visibility#reset', as: 'visibility_reset'
+            post 'visibility/toggle', to: 'visibility#toggle', as: 'visibility_toggle'
+
+            # V9.7 UX/UI Polish - Color Schemes
+            get 'colors/schemes', to: 'colors#schemes', as: 'colors_schemes'
+            post 'colors', to: 'colors#apply'
+            post 'colors/by_property', to: 'colors#by_property', as: 'colors_by_property'
+            post 'colors/reset', to: 'colors#reset', as: 'colors_reset'
           end
         end
 
