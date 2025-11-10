@@ -241,6 +241,18 @@ Rails.application.routes.draw do
           get ':workflowable_type/:workflowable_id/state', action: :workflow_state, as: 'state'
           get ':workflowable_type/:workflowable_id/timeline', action: :workflow_timeline, as: 'timeline'
         end
+
+        # Portfolio Analytics
+        namespace :portfolio, controller: "portfolio" do
+          get 'dashboard', action: :dashboard, as: 'dashboard'
+          get 'metrics', action: :metrics, as: 'metrics'
+          get 'time_series', action: :time_series, as: 'time_series'
+          get 'comparison', action: :comparison, as: 'comparison'
+          get 'breakdown', action: :breakdown, as: 'breakdown'
+          get 'stats', action: :stats, as: 'stats'
+          get 'export', action: :export, as: 'export'
+          post 'collect', action: :collect, as: 'collect'
+        end
       end
     end
   end
